@@ -12,6 +12,7 @@ const moreButton = document.querySelector('.is-hidden');
 const API_KEY = '11329962-6436ba51ddb58bb96deed169a';
 let pageNumber;
 let searchTerm;
+let lightbox;
 
 axios.defaults.baseURL = 'https://pixabay.com/api';
 
@@ -31,6 +32,8 @@ async function imageSearch(e) {
       noFoundMessage();
     } else {
       addMarkup(images);
+      lightbox = new SimpleLightbox('.gallery a');
+      lightbox.refresh();
     }
   } catch (error) {
     errorMessage(error.message);
@@ -44,6 +47,7 @@ async function addMoreImages() {
   try {
     let images = await getImages(searchTerm);
     addMarkup(images);
+    lightbox.refresh();
     let elem = gallery.querySelector('li');
     let rect = elem.getBoundingClientRect();
     scrollBy({
@@ -63,8 +67,8 @@ function addMarkup(images) {
   }
   loader.classList.remove('is-visible');
   gallery.insertAdjacentHTML('beforeend', markup);
-  const lightbox = new SimpleLightbox('.gallery a');
-  lightbox.refresh();
+  
+  
   checkMore(images.totalHits);
 }
 
