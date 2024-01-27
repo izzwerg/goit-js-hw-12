@@ -8,10 +8,13 @@ const form = document.querySelector('.form');
 form.addEventListener('submit', imageSearch);
 const gallery = document.querySelector('.gallery');
 const loader = document.querySelector('.loader');
-const BASE_URL = 'https://pixabay.com/api';
 const API_KEY = '11329962-6436ba51ddb58bb96deed169a';
+let pageNumber;
 
-function imageSearch(e) {
+axios.defaults.baseURL = 'https://pixabay.com/api';
+
+async function imageSearch(e) {
+  pageNumber = 1;
   e.preventDefault();
   gallery.innerHTML = '';
   loader.classList.add('is-visible');
@@ -19,41 +22,41 @@ function imageSearch(e) {
   const form = e.currentTarget;
   const searchTerm = form.elements.searchTerm.value;
 
-  getImages(searchTerm)
-    .then(images => {
-      if (images.hits == 0) {
-        noFoundMessage();
-      } else {
-        let markup = '';
-        for (const image of images.hits) {
-          markup += createMarkup(image);
-        }
-        loader.classList.remove('is-visible');
-        gallery.innerHTML = markup;
-        const lightbox = new SimpleLightbox('.gallery a');
-        lightbox.refresh();
+  try {
+    const images = await getImages(searchTerm);
+
+    if (images.totalHits === 0) {
+      noFoundMessage();
+    } else {
+      let markup = '';
+      for (const image of images.hits) {
+        markup += createMarkup(image);
       }
-    })
-    .catch(error => console.log(error))
-    .finally(() => form.reset());
+      loader.classList.remove('is-visible');
+      gallery.insertAdjacentHTML('beforeend', markup);
+      const lightbox = new SimpleLightbox('.gallery a');
+      lightbox.refresh();
+    }
+  } catch (error){
+    console.log(error);
+  } finally {
+    form.reset();
+  }
 }
 
-function getImages(searchTerm) {
+async function getImages(searchTerm) {
   const urlParams = new URLSearchParams({
     key: API_KEY,
     q: searchTerm,
     image_type: 'photo',
     orientation: 'horizontal',
     safesearch: 'true',
-    per_page: 9,
+    per_page: 40,
+    page: pageNumber,
   });
 
-  return fetch(`${BASE_URL}/?${urlParams}`).then(res => {
-    if (!res.ok) {
-      throw new Error(res.statusText);
-    }
-    return res.json();
-  });
+  const response = await axios.get(`/?${urlParams}`);
+  return response.data;
 }
 
 function createMarkup({
