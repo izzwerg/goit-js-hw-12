@@ -21,6 +21,7 @@ async function imageSearch(e) {
   e.preventDefault();
   gallery.innerHTML = '';
   loader.classList.add('is-visible');
+  moreButton.classList.remove('is-visible');
 
   const form = e.currentTarget;
   searchTerm = form.elements.searchTerm.value;
@@ -30,6 +31,7 @@ async function imageSearch(e) {
 
     if (images.total === 0) {
       noFoundMessage();
+      return;
     } else {
       addMarkup(images);
       lightbox = new SimpleLightbox('.gallery a');
@@ -67,8 +69,6 @@ function addMarkup(images) {
   }
   loader.classList.remove('is-visible');
   gallery.insertAdjacentHTML('beforeend', markup);
-  
-  
   checkMore(images.totalHits);
 }
 
