@@ -9,6 +9,7 @@ form.addEventListener('submit', imageSearch);
 const gallery = document.querySelector('.gallery');
 const loader = document.querySelector('.loader');
 const moreButton = document.querySelector('.is-hidden');
+moreButton.addEventListener('click', addMoreImages);
 const API_KEY = '11329962-6436ba51ddb58bb96deed169a';
 let pageNumber;
 let searchTerm;
@@ -74,7 +75,6 @@ function addMarkup(images) {
 
 function checkMore(maxImages) {
   if (gallery.querySelectorAll('li').length < maxImages) {
-    moreButton.addEventListener('click', addMoreImages);
     moreButton.classList.add('is-visible');
   } else {
     noMoreMessage();
